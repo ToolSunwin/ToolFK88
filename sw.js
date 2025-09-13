@@ -1,6 +1,6 @@
 self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open('txmd5-cache').then(cache => cache.addAll(['./', './index.html', './manifest.json', './icon.png']))
+    caches.open('txmd5-cache').then(cache => cache.addAll(['./', './index.html', './manifest.json', './IMG_4333.jpeg']))
   );
 });
 
