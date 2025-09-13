@@ -1,6 +1,6 @@
 {
   "name": "Tool Tài Xỉu MD5",
-  "short_name": "Tool MD5 FK88",
+  "short_name": "ToolTX",
   "description": "Ứng dụng phân tích kết quả Tài Xỉu MD5.",
   "start_url": "./",
   "display": "standalone",
