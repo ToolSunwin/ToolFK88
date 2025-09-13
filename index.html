@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tool Tài Xỉu MD5 - Neon</title>
+  <style>
+    :root {
+      --main-color: #00ff66; /* Màu xanh neon chủ đạo */
+      --secondary-color: #ff0066; /* Màu hồng neon phụ */
+      --background-dark: #0a0a0a;
+      --background-light: #1c1c1c;
+      --font-family: 'Poppins', sans-serif;
+      --shadow-neon-green: 0 0 10px #00ff66, 0 0 20px #00ff66, 0 0 30px #00ff66;
+      --shadow-neon-red: 0 0 10px #ff0066, 0 0 20px #ff0066, 0 0 30px #ff0066;
+      --shadow-inset-light: inset 0 0 5px rgba(255, 255, 255, 0.1);
+    }
+    
+    body {
+      margin: 0;
+      font-family: var(--font-family);
+      background-color: var(--background-dark);
+      color: #e0e0e0;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 40px;
+      color: var(--main-color);
+      text-shadow: var(--shadow-neon-green);
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+      background-color: transparent;
+      /* Đã loại bỏ viền xanh */
+      border: none;
+      box-shadow: 0 0 50px rgba(0, 255, 102, 0.1), 0 0 100px rgba(0, 255, 102, 0.05);
+      z-index: 2;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      transition: all 0.5s ease-in-out;
+    }
+    
+    .container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 50px rgba(0, 255, 102, 0.2), 0 0 100px rgba(0, 255, 102, 0.1);
+    }
+
+    input, button {
+      width: 100%;
+      box-sizing: border-box;
+      font-size: 1em;
+      padding: 15px;
+      border-radius: 8px;
+      border: none;
+      margin: 15px 0;
+      transition: all 0.3s ease;
+    }
+
+    input {
+      background-color: rgba(42, 42, 42, 0.7);
+      color: var(--main-color);
+      border: 2px solid var(--main-color);
+      box-shadow: var(--shadow-inset-light);
+      font-family: 'Courier New', monospace;
+      text-align: center;
+    }
+    
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+    }
+    
+    input:focus {
+      outline: none;
+      box-shadow: 0 0 10px var(--main-color), inset 0 0 10px var(--main-color);
+    }
+
+    button {
+      background-color: var(--main-color);
+      color: var(--background-dark);
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: var(--shadow-neon-green);
+      letter-spacing: 1px;
+    }
+    
+    button:hover {
+      transform: translateY(-2px);
+      background-color: #33ff88;
+      box-shadow: 0 0 15px var(--main-color), 0 0 25px var(--main-color), 0 0 40px var(--main-color);
+    }
+
+    .lights {
+      display: flex;
+      justify-content: center;
+      margin-top: 40px;
+      gap: 60px;
+    }
+
+    .light {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: #333;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+      transition: all 0.8s ease-in-out;
+      border: 3px solid #555;
+    }
+
+    .green { background-color: #002200; }
+    .red { background-color: #220000; }
+    
+    .on-green {
+      background-color: var(--main-color) !important;
+      box-shadow: 0 0 25px 10px var(--main-color), var(--shadow-neon-green);
+      border-color: var(--main-color);
+    }
+    
+    .on-red {
+      background-color: var(--secondary-color) !important;
+      box-shadow: 0 0 25px 10px var(--secondary-color), var(--shadow-neon-red);
+      border-color: var(--secondary-color);
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+      pointer-events: none;
+      filter: brightness(0.7) blur(1px);
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<canvas id="matrix"></canvas>
+
+<div class="container">
+  <h1>TOOL TX MD5 BY FK88</h1>
+
+  <input id="md5Input" placeholder="Nhập mã MD5..." />
+  <button onclick="analyze()">PHÂN TÍCH</button>
+
+  <div class="lights">
+    <div id="greenLight" class="light green"></div>
+    <div id="redLight" class="light red"></div>
+  </div>
+</div>
+
+<script>
+const OFFSET = 23;
+let blinkInterval = null;
+
+function analyze() {
+  const md5 = document.getElementById('md5Input').value.trim().toLowerCase();
+  const green = document.getElementById('greenLight');
+  const red = document.getElementById('redLight');
+
+  clearInterval(blinkInterval);
+  green.classList.remove('on-green');
+  red.classList.remove('on-red');
+
+  if (md5.length !== 32) return;
+
+  const int24 = parseInt(md5.substr(OFFSET, 6), 16);
+  let index = Math.floor(int24 * 216 / (2**24));
+  const dice = [Math.floor(index / 36) % 6, Math.floor(index / 6) % 6, index % 6].map(x => x + 1);
+  const total = dice.reduce((a,b) => a+b, 0);
+  const isTai = total >= 11;
+
+  const targetLight = isTai ? green : red;
+  const targetClass = isTai ? "on-green" : "on-red";
+
+  blinkInterval = setInterval(() => {
+    targetLight.classList.toggle(targetClass);
+  }, 1000);
+}
+
+// Matrix hacker background
+const canvas = document.getElementById("matrix");
+const ctx = canvas.getContext("2d");
+canvas.height = window.innerHeight;
+canvas.width = window.innerWidth;
+const letters = "アカサタナハマヤラワ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const fontSize = 14;
+const columns = canvas.width / fontSize;
+const drops = Array.from({ length: columns }).fill(1);
+
+function drawMatrix() {
+  ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#0f0";
+  ctx.font = fontSize + "px Courier New";
+  for (let i = 0; i < drops.length; i++) {
+    const text = letters.charAt(Math.floor(Math.random() * letters.length));
+    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+    if (drops[i] * fontSize > canvas.height || Math.random() > 0.975) {
+      drops[i] = 0;
+    }
+    drops[i]++;
+  }
+}
+setInterval(drawMatrix, 50);
+</script>
+
+</body>
+</html>
