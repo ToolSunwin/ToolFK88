@@ -142,6 +142,16 @@
       border-color: var(--secondary-color);
     }
 
+    .dice-results {
+        margin-top: 20px;
+        color: var(--main-color);
+        font-family: 'Courier New', monospace;
+        font-size: 1.2em;
+        text-shadow: var(--shadow-neon-green);
+        text-align: center;
+        min-height: 2em;
+    }
+
     canvas {
       position: fixed;
       top: 0;
@@ -169,35 +179,59 @@
     <div id="greenLight" class="light green"></div>
     <div id="redLight" class="light red"></div>
   </div>
+
+  <div id="diceResults" class="dice-results"></div>
 </div>
 
 <script>
-const OFFSET = 3;
+const OFFSET = 12;
 let blinkInterval = null;
+
+function hexToBytes(hex) {
+    const bytes = [];
+    for (let i = 0; i < hex.length; i += 2) {
+        bytes.push(parseInt(hex.substr(i, 2), 16));
+    }
+    return bytes;
+}
 
 function analyze() {
   const md5 = document.getElementById('md5Input').value.trim().toLowerCase();
   const green = document.getElementById('greenLight');
   const red = document.getElementById('redLight');
+  const diceResults = document.getElementById('diceResults');
 
   clearInterval(blinkInterval);
   green.classList.remove('on-green');
   red.classList.remove('on-red');
+  diceResults.textContent = '';
 
-  if (md5.length !== 32) return;
+  if (md5.length !== 32) {
+    diceResults.textContent = 'MD5 không hợp lệ (32 ký tự)';
+    return;
+  }
 
-  const int24 = parseInt(md5.substr(OFFSET, 6), 16);
-  let index = Math.floor(int24 * 216 / (2**24));
-  const dice = [Math.floor(index / 36) % 6, Math.floor(index / 6) % 6, index % 6].map(x => x + 1);
-  const total = dice.reduce((a,b) => a+b, 0);
-  const isTai = total >= 11;
+  try {
+      const bytesList = hexToBytes(md5);
+      
+      const byte11 = bytesList[10];
+      const byte3 = bytesList[2];
+      const total = bytesList[OFFSET] + byte11 + byte3;
 
-  const targetLight = isTai ? green : red;
-  const targetClass = isTai ? "on-green" : "on-red";
+      const isTai = total % 2 === 0; // Chẵn -> Tài, Lẻ -> Xỉu
+      
+      const targetLight = isTai ? green : red;
+      const targetClass = isTai ? "on-green" : "on-red";
 
-  blinkInterval = setInterval(() => {
-    targetLight.classList.toggle(targetClass);
-  }, 1000);
+      diceResults.textContent = `Giá trị tổng: ${total}`;
+
+      blinkInterval = setInterval(() => {
+        targetLight.classList.toggle(targetClass);
+      }, 1000);
+
+  } catch (e) {
+      diceResults.textContent = 'Lỗi xử lý MD5.';
+  }
 }
 
 // Đăng ký Service Worker
@@ -242,3 +276,4 @@ setInterval(drawMatrix, 50);
 
 </body>
 </html>
+
