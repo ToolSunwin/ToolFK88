@@ -4,6 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Tool Tài Xỉu MD5 - Neon</title>
+  
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon.png">
+
   <style>
     :root {
       --main-color: #00ff66; /* Màu xanh neon chủ đạo */
@@ -44,7 +52,6 @@
       align-items: center;
       padding: 40px;
       background-color: transparent;
-      /* Đã loại bỏ viền xanh */
       border: none;
       box-shadow: 0 0 50px rgba(0, 255, 102, 0.1), 0 0 100px rgba(0, 255, 102, 0.05);
       z-index: 2;
@@ -191,6 +198,19 @@ function analyze() {
   blinkInterval = setInterval(() => {
     targetLight.classList.toggle(targetClass);
   }, 1000);
+}
+
+// Đăng ký Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(registration => {
+        console.log('Service Worker registered!');
+      })
+      .catch(err => {
+        console.log('Service Worker registration failed:', err);
+      });
+  });
 }
 
 // Matrix hacker background
