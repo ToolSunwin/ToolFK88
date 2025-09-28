@@ -184,7 +184,7 @@
 </div>
 
 <script>
-const OFFSET = 12;
+const OFFSET = 4;
 let blinkInterval = null;
 
 function hexToBytes(hex) {
@@ -218,7 +218,7 @@ function analyze() {
       const byte3 = bytesList[2];
       const total = bytesList[OFFSET] + byte11 + byte3;
 
-      const isTai = total % 2 === 0; // Chẵn -> Tài, Lẻ -> Xỉu
+      const isTai = total % 2 === 1; // Chẵn -> Tài, Lẻ -> Xỉu
       
       const targetLight = isTai ? green : red;
       const targetClass = isTai ? "on-green" : "on-red";
